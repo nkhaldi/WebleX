@@ -10,7 +10,6 @@ greenlet==3.0.3
 h11==0.14.0
 idna==3.6
 isort==5.13.2
-logging==0.4.9.6
 mccabe==0.7.0
 mypy-extensions==1.0.0
 packaging==23.2

@@ -1,10 +1,16 @@
 FROM python:3.10-slim
 
-WORKDIR /usr/app
+# Set the working directory
+# WORKDIR /usr/app
+WORKDIR /app
 
 # Copy and install requirements
-COPY ./ci/requirements.txt .
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir -r requirements.txt
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-EXPOSE 8000
+# Copy the app code into the container
+COPY ./app /app
+
+# Define the command to run the app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
