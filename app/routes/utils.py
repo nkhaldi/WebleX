@@ -2,9 +2,10 @@
 
 import math
 
-from routes.database import AsyncSessionLocal, Route, RoutePoint
 from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
+
+from routes.database import AsyncSessionLocal, Route, RoutePoint
 
 
 async def get_route_from_db(route_id: int) -> Route:

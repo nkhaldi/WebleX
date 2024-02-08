@@ -1,10 +1,11 @@
 """Database models and connection."""
 
-from routes.config import Config
 from sqlalchemy import Column, Float, ForeignKey, Integer, MetaData, String
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker
+
+from routes.config import Config
 
 config = Config()
 
