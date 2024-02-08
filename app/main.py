@@ -3,14 +3,18 @@
 import csv
 from io import StringIO
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Request, UploadFile
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
 
 from routes.database import RoutePoint, close_db, init_db
 from routes.utils import get_route_from_db, optimize_route, save_route_to_db
 
 # Start the FastAPI app
 app = FastAPI()
+
+# Use Jinja2 for HTML templates
+templates = Jinja2Templates(directory="templates")
 
 
 @app.on_event("startup")
@@ -26,18 +30,8 @@ async def shutdown_event():
 
 
 @app.get("/", response_class=HTMLResponse)
-async def root():
-    return """
-    <html>
-        <head>
-            <title>WelbeX</title>
-        </head>
-        <body>
-            <h1>Welcome to our WelbeX application!</h1>
-            <h3>Visit <a href="/docs">/docs</a> to explore the API documentation and test the endpoints.</h3>
-        </body>
-    </html>
-    """
+async def root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @app.get("/api/routes/{route_id}")
@@ -60,7 +54,7 @@ async def upload_routes(file: UploadFile = File(...)):
     points = [RoutePoint(lat=float(row["lat"]), lng=float(row["lng"])) for row in reader]
 
     # Здесь логика оптимизации маршрута
-    optimized_route = await optimize_route(points)
+    optimized_route = optimize_route(points)
 
     # Логика сохранения оптимизированного маршрута в базу данных
     route_id = await save_route_to_db(optimized_route)
