@@ -33,6 +33,31 @@ async def save_route_to_db(points: list[RoutePoint]) -> int:
         return new_route.id
 
 
+async def delete_route_from_db(route_id: int) -> bool:
+    """Delete a route from the database by its ID."""
+    async with AsyncSessionLocal() as session:
+        async with session.begin():
+            # Find all points for the route
+            points_statement = select(RoutePoint).where(RoutePoint.route_id == route_id)
+            points_result = await session.execute(points_statement)
+            points_to_delete = points_result.scalars().all()
+
+            # Delete all points for the route
+            for point in points_to_delete:
+                await session.delete(point)
+
+            #  Delete the route
+            route_statement = select(Route).where(Route.id == route_id)
+            route_result = await session.execute(route_statement)
+            route_to_delete = route_result.scalar_one_or_none()
+
+            if route_to_delete:
+                await session.delete(route_to_delete)
+                return True
+            else:
+                return False
+
+
 def calculate_distance(point1: RoutePoint, point2: RoutePoint) -> float:
     """Calculate the distance between two points."""
     return math.sqrt((point1.lat - point2.lat) ** 2 + (point1.lng - point2.lng) ** 2)

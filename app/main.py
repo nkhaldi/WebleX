@@ -8,7 +8,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 
 from routes.database import RoutePoint, close_db, init_db
-from routes.utils import get_route_from_db, optimize_route, save_route_to_db
+from routes.utils import delete_route_from_db, get_route_from_db, optimize_route, save_route_to_db
 
 # Start the FastAPI app
 app = FastAPI()
@@ -62,4 +62,13 @@ async def upload_routes(file: UploadFile = File(...)):
     points = [{"lat": point.lat, "lng": point.lng} for point in optimized_route]
 
     return JSONResponse(status_code=200, content={"id": route_id, "points": points})
-    # return JSONResponse(status_code=200, content={"id": route_id, "points": optimized_route})
+
+
+@app.delete("/api/routes/{route_id}")
+async def delete_route(route_id: int):
+    """Delete a route by ID."""
+    is_deleted = await delete_route_from_db(route_id)
+    if is_deleted:
+        return {"message": "Route deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Route not found")
